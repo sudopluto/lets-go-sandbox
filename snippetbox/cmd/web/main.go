@@ -7,12 +7,15 @@ import (
     "net/http"
     "os"
 
+    "github.com/sudopluto/lets-go-sandbox/pkg/models/mysql"
+
     _ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
     errorLog *log.Logger
     infoLog  *log.Logger
+    snippets *mysql.SnippetModel
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -50,6 +53,7 @@ func main() {
     app := &application{
         errorLog: errorLog,
         infoLog:  infoLog,
+        snippets: &mysql.SnippetModel{DB: db},
     }
 
 	// create new router
