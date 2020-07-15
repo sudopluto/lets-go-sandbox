@@ -2,9 +2,11 @@ package main
 
 import (
     "fmt"
-    "html/template"
+//    "html/template"
     "net/http"
     "strconv"
+
+    "github.com/sudopluto/lets-go-sandbox/pkg/models"
 )
 
 // handler for home
@@ -16,6 +18,17 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    s, err := app.snippets.Latest()
+    if err != nil {
+        app.serverError(w, err)
+        return
+    }
+
+    for _, snippet := range s {
+        fmt.Fprintf(w, "%v\n", snippet)
+    }
+
+    /*
     files := []string{
         "./ui/html/home.page.tmpl",
         "./ui/html/base.layout.tmpl",
@@ -34,6 +47,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         app.serverError(w, err)
     }
+    */
 
 }
 
@@ -45,7 +59,16 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    fmt.Fprintf(w, "Display snippet with ID: %d...\n", id)
+    s, err := app.snippets.Get(id)
+    if err == models.ErrNoRecord {
+        app.notFound(w)
+        return
+    } else if err != nil {
+        app.serverError(w, err)
+        return
+    }
+
+    fmt.Fprintf(w, "%v", s)
 }
 
 // handler for create snippet
